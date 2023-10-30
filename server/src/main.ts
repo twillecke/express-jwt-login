@@ -29,8 +29,34 @@ app.get("/user", async (req, res) => {
 	}
 });
 
+app.get("/user/:username", async (req, res) => {
+	const { username } = req.params;
+	try {
+		const data = await db.query(
+			"SELECT name, email FROM thiago.auth_user where username = $1;",
+			[username],
+		);
+		res.json(data);
+	} catch (error) {
+		console.error("Error:", error);
+		res.status(500).json({ error: "Internal Server Error" });
+	}
+});
+
 app.post("/user", async (req, res) => {
 	const { name, lastname, email, username, password } = req.body;
+
+	if (
+		name === "" ||
+		lastname === "" ||
+		email === "" ||
+		username === "" ||
+		password === ""
+	) {
+		return res.status(400).json({
+			error: "Invalid data. Please provide all required fields.",
+		});
+	}
 
 	try {
 		const existingUser = await db.oneOrNone(

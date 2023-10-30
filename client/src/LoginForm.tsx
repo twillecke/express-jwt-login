@@ -15,7 +15,8 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 	const [invalidAuth, setInvalidAuth] = useState(false);
 	const navigate = useNavigate();
 
-	function LoginClickHandler() {
+	function LoginClickHandler(e: { preventDefault: () => void; }) {
+		e.preventDefault();
 		const loginInputData = {
 			username: formData.username,
 			password: formData.password,
@@ -54,7 +55,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 		<div className="flex justify-center items-center h-screen">
 			<div className="bg-neutral-600 p-10 rounded-md">
 				<h2 className="mb-4">Login Form</h2>
-				<form className="flex flex-col">
+				<form onSubmit={LoginClickHandler} className="flex flex-col">
 					<input
 						className={`mb-3 p-3 rounded-md border-2 ${
 							invalidAuth ? "border-2 border-red-700" : ""
@@ -81,9 +82,8 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 							Sign Up
 						</a>
 						<button
-							onClick={LoginClickHandler}
 							className="pt-2 text-blue-400 hover:text-blue-500 focus:border-transparent hover:border-transparent"
-							type="button"
+							type="submit"
 						>
 							Login
 						</button>

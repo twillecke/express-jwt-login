@@ -11,6 +11,8 @@ export default function RegisterForm() {
 		password: "",
 	});
 
+	const [invalidAuth, setInvalidAuth] = useState(false);
+
 	const navigate = useNavigate();
 
 	const SignUpClickHandler = async (e: React.FormEvent) => {
@@ -34,9 +36,11 @@ export default function RegisterForm() {
 				navigate("/login");
 			} else {
 				console.log("Registration failed");
+				setInvalidAuth(true);
 			}
 		} catch (error) {
 			console.error("Error:", error);
+			setInvalidAuth(true);
 		}
 	};
 
@@ -56,7 +60,9 @@ export default function RegisterForm() {
 					<div>
 						<input
 							name="name-input"
-							className="mb-3 mr-3 p-3 rounded-md"
+							className={`mb-3 mr-3 p-3 rounded-md border-2 ${
+								invalidAuth ? "border-2 border-red-700" : ""
+							}`}
 							type="text"
 							placeholder="Name"
 							value={formData.name}
@@ -64,7 +70,9 @@ export default function RegisterForm() {
 						></input>
 						<input
 							name="last-name-input"
-							className="mb-3 p-3 rounded-md"
+							className={`mb-3 p-3 rounded-md border-2 ${
+								invalidAuth ? "border-2 border-red-700" : ""
+							}`}
 							type="text"
 							placeholder="Last Name"
 							value={formData.lastName}
@@ -73,7 +81,9 @@ export default function RegisterForm() {
 					</div>
 					<input
 						name="email-input"
-						className="mb-12 p-3 rounded-md"
+						className={`mb-12 p-3 rounded-md border-2 ${
+							invalidAuth ? "border-2 border-red-700" : ""
+						}`}
 						type="email"
 						placeholder="E-mail Address"
 						value={formData.emailAddress}
@@ -82,7 +92,9 @@ export default function RegisterForm() {
 					<h2 className="mb-4">Login Data</h2>
 					<input
 						name="username-input"
-						className="mb-3 mr-3 p-3 rounded-md"
+						className={`mb-3 mr-3 p-3 rounded-md border-2 ${
+							invalidAuth ? "border-2 border-red-700" : ""
+						}`}
 						type="text"
 						placeholder="Username"
 						value={formData.username}
@@ -90,7 +102,9 @@ export default function RegisterForm() {
 					></input>
 					<input
 						name="password-input"
-						className="mb-3 p-3 rounded-md"
+						className={`mb-3 p-3 rounded-md border-2 ${
+							invalidAuth ? "border-2 border-red-700" : ""
+						}`}
 						type="password"
 						placeholder="Password"
 						value={formData.password}
