@@ -1,3 +1,4 @@
+import axios from "axios";
 import { ChangeEvent, useState } from "react";
 
 export default function LoginForm() {
@@ -11,7 +12,20 @@ export default function LoginForm() {
 			username: formData.username,
 			password: formData.password,
 		};
-		console.log(loginInputData);
+		axios
+			.post("http://localhost:3000/login", loginInputData)
+			.then((response) => {
+				if (response.status === 200) {
+					console.log("Login successful");
+				} else if (response.status === 401) {
+					console.log("Invalid username or password");
+				} else {
+					console.log("Login failed");
+				}
+			})
+			.catch((error) => {
+				console.error("Error:", error);
+			});
 	}
 
 	const handleInputChange = (
@@ -25,7 +39,7 @@ export default function LoginForm() {
 	return (
 		<div className="flex justify-center items-center h-screen">
 			<div className="bg-neutral-600 p-10 rounded-md">
-				<h2 className='mb-4'>Login Form</h2>
+				<h2 className="mb-4">Login Form</h2>
 				<form className="flex flex-col">
 					<input
 						className="mb-3 p-3 rounded-md"

@@ -1,5 +1,6 @@
 import express from "express";
 import pgp from "pg-promise";
+import cors from "cors";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -7,6 +8,15 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 
 const db = pgp()("postgres://postgres:123@localhost:5444/app");
+
+app.use(
+	cors({
+		origin: "*",
+		methods: "GET,POST,PUT,DELETE,OPTIONS",
+		allowedHeaders:
+			"Origin,X-Requested-With,Content-Type,Accept,Authorization",
+	}),
+);
 
 app.get("/user", async (req, res) => {
 	try {
