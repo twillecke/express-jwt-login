@@ -25,13 +25,8 @@ const initialSession: Session = {
 function App() {
 	const [session, setSession] = useState(initialSession);
 
-	const handleLogin = () => {
-		setSession({
-			...session,
-			isLoggedIn: true,
-			user: "susan",
-			email: "susan@gmail.com",
-		});
+	const handleLogin = (newSession: Session) => {
+		setSession(newSession);
 	};
 
 	return (

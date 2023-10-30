@@ -1,9 +1,15 @@
+type Session = {
+	isLoggedIn: boolean;
+	user: string;
+	email: string;
+};
+
 import axios from "axios";
 import { ChangeEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface LoginFormProps {
-	onLogin: () => void;
+	onLogin: (session: Session) => void;
 }
 
 export default function LoginForm({ onLogin }: LoginFormProps) {
@@ -15,31 +21,48 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 	const [invalidAuth, setInvalidAuth] = useState(false);
 	const navigate = useNavigate();
 
-	function LoginClickHandler(e: { preventDefault: () => void; }) {
+	async function LoginClickHandler(e: React.FormEvent) {
 		e.preventDefault();
 		const loginInputData = {
 			username: formData.username,
 			password: formData.password,
 		};
-		axios
-			.post("http://localhost:3000/login", loginInputData)
-			.then((response) => {
-				if (response.status === 200) {
-					console.log("Login successful");
-					onLogin();
-					navigate("/user-profile");
-				} else if (response.status === 401) {
-					console.log("Invalid username or password");
-					setInvalidAuth(true);
-				} else {
-					console.log("Login failed");
-					setInvalidAuth(true);
-				}
-			})
-			.catch((error) => {
-				console.error("Error:", error);
+
+		try {
+			const response = await axios.post(
+				"http://localhost:3000/login",
+				loginInputData,
+			);
+
+			if (response.status === 200) {
+				console.log("Login successful");
+				// Fetch user data or relevant information here and create a session object
+				const userData = await fetchUserData(formData.username); // Adjust this according to your API
+				const session = {
+					isLoggedIn: true,
+					user: userData.name,
+					email: userData.email, // Include relevant user data
+				};
+				onLogin(session); // Pass the session object to the callback
+				navigate("/user-profile");
+			} else if (response.status === 401) {
+				console.log("Invalid username or password");
 				setInvalidAuth(true);
-			});
+			} else {
+				console.log("Login failed");
+				setInvalidAuth(true);
+			}
+		} catch (error) {
+			console.error("Error:", error);
+			setInvalidAuth(true);
+		}
+	}
+
+	async function fetchUserData(username: string) {
+		const response = await axios.get(
+			`http://localhost:3000/user/${username}`,
+		);
+		return response.data[0];
 	}
 
 	const handleInputChange = (
