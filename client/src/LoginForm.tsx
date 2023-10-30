@@ -1,11 +1,18 @@
 import axios from "axios";
 import { ChangeEvent, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
-export default function LoginForm() {
+interface LoginFormProps {
+	onLogin: () => void;
+}
+
+export default function LoginForm({ onLogin }: LoginFormProps) {
 	const [formData, setFormData] = useState({
 		username: "",
 		password: "",
 	});
+
+	const navigate = useNavigate();
 
 	function LoginClickHandler() {
 		const loginInputData = {
@@ -17,6 +24,8 @@ export default function LoginForm() {
 			.then((response) => {
 				if (response.status === 200) {
 					console.log("Login successful");
+					onLogin();
+					navigate("/user-profile");
 				} else if (response.status === 401) {
 					console.log("Invalid username or password");
 				} else {
