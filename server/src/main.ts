@@ -1,6 +1,7 @@
 import express from "express";
 import pgp from "pg-promise";
 import cors from "cors";
+const bcrypt = require("bcrypt");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -29,7 +30,7 @@ app.get("/user", async (req, res) => {
 });
 
 app.post("/user", async (req, res) => {
-	const {name, lastname, email, username, password } = req.body;
+	const { name, lastname, email, username, password } = req.body;
 
 	try {
 		const existingUser = await db.oneOrNone(
@@ -39,9 +40,12 @@ app.post("/user", async (req, res) => {
 		if (existingUser) {
 			res.status(409).json({ error: "Username already exists" });
 		} else {
+			const saltRounds = 10;
+			const hashedPassword = await bcrypt.hash(password, saltRounds);
+
 			await db.query(
 				"INSERT INTO thiago.auth_user (name, lastname, email, username, password) VALUES ($1, $2, $3, $4, $5);",
-				[name, lastname, email, username, password],
+				[name, lastname, email, username, hashedPassword],
 			);
 			res.status(201).json({ message: "User added successfully" });
 		}
@@ -56,12 +60,19 @@ app.post("/login", async (req, res) => {
 
 	try {
 		const user = await db.oneOrNone(
-			"SELECT * FROM thiago.auth_user WHERE username = $1 AND password = $2;",
-			[username, password],
+			"SELECT * FROM thiago.auth_user WHERE username = $1;",
+			[username],
 		);
-
 		if (user) {
-			res.status(200).json({ message: "Login successful" });
+			const isPasswordValid = await bcrypt.compare(
+				password,
+				user.password,
+			);
+			if (isPasswordValid) {
+				res.status(200).json({ message: "Login successful" });
+			} else {
+				res.status(401).json({ error: "Invalid username or password" });
+			}
 		} else {
 			res.status(401).json({ error: "Invalid username or password" });
 		}

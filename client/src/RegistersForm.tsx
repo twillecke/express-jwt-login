@@ -1,5 +1,6 @@
 import axios from "axios";
 import { ChangeEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function RegisterForm() {
 	const [formData, setFormData] = useState({
@@ -10,8 +11,10 @@ export default function RegisterForm() {
 		password: "",
 	});
 
-	const SignUpClickHandler = (e: React.FormEvent) => {
-		e.preventDefault(); // Prevent the default form submission
+	const navigate = useNavigate();
+
+	const SignUpClickHandler = async (e: React.FormEvent) => {
+		e.preventDefault();
 		const registrationData = {
 			name: formData.name,
 			lastname: formData.lastName,
@@ -20,22 +23,21 @@ export default function RegisterForm() {
 			password: formData.password,
 		};
 
-		axios
-			.post(
+		try {
+			const response = await axios.post(
 				"http://localhost:3000/user",
 				registrationData,
-			)
-			.then((response) => {
-				if (response.status === 201) {
-					console.log("Registration successful");
-					// You can add further actions like redirecting to a success page here
-				} else {
-					console.log("Registration failed");
-				}
-			})
-			.catch((error) => {
-				console.error("Error:", error);
-			});
+			);
+
+			if (response.status === 201) {
+				console.log("Registration successful");
+				navigate("/login");
+			} else {
+				console.log("Registration failed");
+			}
+		} catch (error) {
+			console.error("Error:", error);
+		}
 	};
 
 	const handleInputChange = (
@@ -72,7 +74,7 @@ export default function RegisterForm() {
 					<input
 						name="email-input"
 						className="mb-12 p-3 rounded-md"
-						type="email" // Use type="email" for email validation
+						type="email"
 						placeholder="E-mail Address"
 						value={formData.emailAddress}
 						onChange={(e) => handleInputChange(e, "emailAddress")}
@@ -96,14 +98,14 @@ export default function RegisterForm() {
 					></input>
 					<div className="flex justify-end">
 						<a
-							href="/login" // Link to the login page
+							href="/login"
 							className="pt-2 text-zinc-300 hover:text-zinc-400"
 						>
 							Login
 						</a>
 						<button
 							className="pt-2 text-blue-400 hover:text-blue-500 focus:border-transparent hover:border-transparent"
-							type="submit" // Change type to "submit"
+							type="submit"
 						>
 							Sign Up
 						</button>

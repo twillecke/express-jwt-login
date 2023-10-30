@@ -1,6 +1,5 @@
 import { Route, Outlet, BrowserRouter, Routes, Navigate } from "react-router-dom";
-
-import LoginForm from "./LoginForm"; // Import your LoginForm component
+import LoginForm from "./LoginForm"; 
 import RegisterForm from "./RegistersForm";
 import UserProfile from "./UserProfile";
 import { useState } from "react";

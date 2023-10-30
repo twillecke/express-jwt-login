@@ -1,6 +1,6 @@
 import axios from "axios";
 import { ChangeEvent, useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 
 interface LoginFormProps {
 	onLogin: () => void;
@@ -12,9 +12,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 		password: "",
 	});
 
-	const [invalidAuth, setInvalidAuth] = useState(false); // Add invalidAuth state
-
-	// Use useNavigate hook to access the navigation function
+	const [invalidAuth, setInvalidAuth] = useState(false);
 	const navigate = useNavigate();
 
 	function LoginClickHandler() {
@@ -28,8 +26,6 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 				if (response.status === 200) {
 					console.log("Login successful");
 					onLogin();
-
-					// Navigate to the "user-profile" route upon successful login
 					navigate("/user-profile");
 				} else if (response.status === 401) {
 					console.log("Invalid username or password");
@@ -51,8 +47,6 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 	) => {
 		const value = e.target.value;
 		setFormData({ ...formData, [field]: value });
-
-		// Reset invalidAuth when the user starts typing
 		setInvalidAuth(false);
 	};
 
@@ -72,7 +66,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 					></input>
 					<input
 						className={`mb-3 p-3 rounded-md border-2 ${
-							invalidAuth ? "border-2 border-red-700" : "" 
+							invalidAuth ? "border-2 border-red-700" : ""
 						}`}
 						type="password"
 						placeholder="Password"
