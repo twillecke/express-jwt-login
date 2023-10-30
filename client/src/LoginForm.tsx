@@ -1,12 +1,7 @@
-type Session = {
-	isLoggedIn: boolean;
-	user: string;
-	email: string;
-};
-
 import axios from "axios";
 import { ChangeEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Session } from "./types/Session";
 
 interface LoginFormProps {
 	onLogin: (session: Session) => void;
