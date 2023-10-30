@@ -12,6 +12,9 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 		password: "",
 	});
 
+	const [invalidAuth, setInvalidAuth] = useState(false); // Add invalidAuth state
+
+	// Use useNavigate hook to access the navigation function
 	const navigate = useNavigate();
 
 	function LoginClickHandler() {
@@ -25,15 +28,20 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 				if (response.status === 200) {
 					console.log("Login successful");
 					onLogin();
+
+					// Navigate to the "user-profile" route upon successful login
 					navigate("/user-profile");
 				} else if (response.status === 401) {
 					console.log("Invalid username or password");
+					setInvalidAuth(true);
 				} else {
 					console.log("Login failed");
+					setInvalidAuth(true);
 				}
 			})
 			.catch((error) => {
 				console.error("Error:", error);
+				setInvalidAuth(true);
 			});
 	}
 
@@ -43,6 +51,9 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 	) => {
 		const value = e.target.value;
 		setFormData({ ...formData, [field]: value });
+
+		// Reset invalidAuth when the user starts typing
+		setInvalidAuth(false);
 	};
 
 	return (
@@ -51,14 +62,18 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 				<h2 className="mb-4">Login Form</h2>
 				<form className="flex flex-col">
 					<input
-						className="mb-3 p-3 rounded-md"
+						className={`mb-3 p-3 rounded-md border-2 ${
+							invalidAuth ? "border-2 border-red-700" : ""
+						}`}
 						type="text"
 						placeholder="Username"
 						value={formData.username}
 						onChange={(e) => handleInputChange(e, "username")}
 					></input>
 					<input
-						className="mb-3 p-3 rounded-md"
+						className={`mb-3 p-3 rounded-md border-2 ${
+							invalidAuth ? "border-2 border-red-700" : "" 
+						}`}
 						type="password"
 						placeholder="Password"
 						value={formData.password}

@@ -59,6 +59,7 @@ export default function RegisterForm() {
 						value={formData.emailAddress}
 						onChange={(e) => handleInputChange(e, "emailAddress")}
 					></input>
+					<h2 className="mb-4">Login Data</h2>
 					<input
 						name="username-input"
 						className="mb-3 p-3 rounded-md"
