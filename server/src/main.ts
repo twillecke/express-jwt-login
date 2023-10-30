@@ -29,7 +29,7 @@ app.get("/user", async (req, res) => {
 });
 
 app.post("/user", async (req, res) => {
-	const { username, password } = req.body;
+	const {name, lastname, email, username, password } = req.body;
 
 	try {
 		const existingUser = await db.oneOrNone(
@@ -40,8 +40,8 @@ app.post("/user", async (req, res) => {
 			res.status(409).json({ error: "Username already exists" });
 		} else {
 			await db.query(
-				"INSERT INTO thiago.auth_user (username, password) VALUES ($1, $2);",
-				[username, password],
+				"INSERT INTO thiago.auth_user (name, lastname, email, username, password) VALUES ($1, $2, $3, $4, $5);",
+				[name, lastname, email, username, password],
 			);
 			res.status(201).json({ message: "User added successfully" });
 		}
