@@ -35,7 +35,8 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 				const session = {
 					isLoggedIn: true,
 					user: userData.name,
-					email: userData.email, // Include relevant user data
+					email: userData.email,
+					user_id: userData.user_id,
 				};
 				onLogin(session); // Pass the session object to the callback
 				navigate("/user-profile");

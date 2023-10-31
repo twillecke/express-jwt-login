@@ -24,7 +24,7 @@ app.use(
 app.get("/users", async (req, res) => {
 	try {
 		const data = await db.query(
-			"SELECT * FROM thiago.user_login_data;",
+			"SELECT user_id, name, lastname, email, signup_date FROM thiago.user_account;",
 			[],
 		);
 		res.json(data);
@@ -75,9 +75,9 @@ app.post("/users", async (req, res) => {
 		} else {
 			// Step 2: Insert user account information into the "user_account" table
 			const userAccountQuery = `
-                INSERT INTO thiago.user_account (name, lastname, email)
-                VALUES ($1, $2, $3)
-                RETURNING user_id;
+			INSERT INTO thiago.user_account (name, lastname, email, signup_date)
+			VALUES ($1, $2, $3, NOW())
+			RETURNING user_id;
             `;
 
 			const userAccountResult = await db.one(userAccountQuery, [

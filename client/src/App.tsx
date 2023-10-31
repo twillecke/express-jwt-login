@@ -15,6 +15,7 @@ const initialSession: Session = {
 	isLoggedIn: false,
 	user: "",
 	email: "",
+	user_id: ""
 };
 
 function App() {
