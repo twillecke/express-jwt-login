@@ -4,11 +4,13 @@ import cors from "cors";
 const bcrypt = require("bcrypt");
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
+const PGP_CONNECTION =
+	process.env.PGP_CONNECTION || "postgres://postgres:123@localhost:5444/app";
 
 app.use(express.json());
 
-const db = pgp()("postgres://postgres:123@localhost:5444/app");
+const db = pgp()(PGP_CONNECTION);
 
 app.use(
 	cors({
@@ -19,7 +21,7 @@ app.use(
 	}),
 );
 
-app.get("/user", async (req, res) => {
+app.get("/users", async (req, res) => {
 	try {
 		const data = await db.query("SELECT * FROM thiago.auth_user;", []);
 		res.json(data);
@@ -29,7 +31,7 @@ app.get("/user", async (req, res) => {
 	}
 });
 
-app.get("/user/:username", async (req, res) => {
+app.get("/users/:username", async (req, res) => {
 	const { username } = req.params;
 	try {
 		const data = await db.query(
@@ -43,7 +45,7 @@ app.get("/user/:username", async (req, res) => {
 	}
 });
 
-app.post("/user", async (req, res) => {
+app.post("/users", async (req, res) => {
 	const { name, lastname, email, username, password } = req.body;
 
 	if (
@@ -108,6 +110,6 @@ app.post("/login", async (req, res) => {
 	}
 });
 
-app.listen(port, () => {
-	console.log(`Server is running on port ${port}`);
+app.listen(PORT, () => {
+	console.log(`Server is running on port ${PORT}`);
 });

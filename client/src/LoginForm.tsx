@@ -55,7 +55,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 
 	async function fetchUserData(username: string) {
 		const response = await axios.get(
-			`http://localhost:3000/user/${username}`,
+			`http://localhost:3000/users/${username}`,
 		);
 		return response.data[0];
 	}
