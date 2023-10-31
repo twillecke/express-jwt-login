@@ -32,14 +32,11 @@ export default function RegisterForm() {
 			);
 
 			if (response.status === 201) {
-				console.log("Registration successful");
 				navigate("/login");
 			} else {
-				console.log("Registration failed");
 				setInvalidAuth(true);
 			}
 		} catch (error) {
-			console.error("Error:", error);
 			setInvalidAuth(true);
 		}
 	};

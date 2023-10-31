@@ -23,7 +23,10 @@ app.use(
 
 app.get("/users", async (req, res) => {
 	try {
-		const data = await db.query("SELECT * FROM thiago.auth_user;", []);
+		const data = await db.query(
+			"SELECT * FROM thiago.user_login_data;",
+			[],
+		);
 		res.json(data);
 	} catch (error) {
 		console.error("Error:", error);
@@ -31,12 +34,12 @@ app.get("/users", async (req, res) => {
 	}
 });
 
-app.get("/users/:username", async (req, res) => {
-	const { username } = req.params;
+app.get("/users/:user_id", async (req, res) => {
+	const { user_id } = req.params;
 	try {
 		const data = await db.query(
-			"SELECT name, email FROM thiago.auth_user where username = $1;",
-			[username],
+			"SELECT * FROM thiago.user_account where user_id = $1;",
+			[user_id],
 		);
 		res.json(data);
 	} catch (error) {
@@ -61,20 +64,40 @@ app.post("/users", async (req, res) => {
 	}
 
 	try {
+		// Step 1: Check if the username already exists in "user_login_data"
 		const existingUser = await db.oneOrNone(
-			"SELECT username FROM thiago.auth_user WHERE username = $1;",
+			"SELECT username FROM thiago.user_login_data WHERE username = $1;",
 			[username],
 		);
+
 		if (existingUser) {
 			res.status(409).json({ error: "Username already exists" });
 		} else {
+			// Step 2: Insert user account information into the "user_account" table
+			const userAccountQuery = `
+                INSERT INTO thiago.user_account (name, lastname, email)
+                VALUES ($1, $2, $3)
+                RETURNING user_id;
+            `;
+
+			const userAccountResult = await db.one(userAccountQuery, [
+				name,
+				lastname,
+				email,
+			]);
+
+			// Retrieve the generated user_id
+			const user_id = userAccountResult.user_id;
+
+			// Step 3: Insert user login data into the "user_login_data" table with the obtained user_id
 			const saltRounds = 10;
-			const hashedPassword = await bcrypt.hash(password, saltRounds);
+			const hashPassword = await bcrypt.hash(password, saltRounds);
 
 			await db.query(
-				"INSERT INTO thiago.auth_user (name, lastname, email, username, password) VALUES ($1, $2, $3, $4, $5);",
-				[name, lastname, email, username, hashedPassword],
+				"INSERT INTO thiago.user_login_data (user_id, username, hashpassword) VALUES ($1, $2, $3);",
+				[user_id, username, hashPassword],
 			);
+
 			res.status(201).json({ message: "User added successfully" });
 		}
 	} catch (error) {
@@ -88,16 +111,19 @@ app.post("/login", async (req, res) => {
 
 	try {
 		const user = await db.oneOrNone(
-			"SELECT * FROM thiago.auth_user WHERE username = $1;",
+			"SELECT user_id, username, hashpassword FROM thiago.user_login_data WHERE username = $1;",
 			[username],
 		);
 		if (user) {
 			const isPasswordValid = await bcrypt.compare(
 				password,
-				user.password,
+				user.hashpassword,
 			);
 			if (isPasswordValid) {
-				res.status(200).json({ message: "Login successful" });
+				res.status(200).json({
+					message: "Login successful",
+					user_id: user.user_id,
+				});
 			} else {
 				res.status(401).json({ error: "Invalid username or password" });
 			}

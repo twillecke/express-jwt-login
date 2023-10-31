@@ -27,12 +27,11 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 			const response = await axios.post(
 				"http://localhost:3000/login",
 				loginInputData,
-			);
+			);		
 
 			if (response.status === 200) {
-				console.log("Login successful");
 				// Fetch user data or relevant information here and create a session object
-				const userData = await fetchUserData(formData.username); // Adjust this according to your API
+				const userData = await fetchUserData(response.data.user_id); // Adjust this according to your API
 				const session = {
 					isLoggedIn: true,
 					user: userData.name,
@@ -41,10 +40,8 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 				onLogin(session); // Pass the session object to the callback
 				navigate("/user-profile");
 			} else if (response.status === 401) {
-				console.log("Invalid username or password");
 				setInvalidAuth(true);
 			} else {
-				console.log("Login failed");
 				setInvalidAuth(true);
 			}
 		} catch (error) {
@@ -53,9 +50,9 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 		}
 	}
 
-	async function fetchUserData(username: string) {
+	async function fetchUserData(user_id: string) {
 		const response = await axios.get(
-			`http://localhost:3000/users/${username}`,
+			`http://localhost:3000/users/${user_id}`,
 		);
 		return response.data[0];
 	}
