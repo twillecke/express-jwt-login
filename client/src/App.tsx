@@ -25,6 +25,10 @@ function App() {
 		setSession(newSession);
 	};
 
+	const handleLogOut = (newSession: Session) => {
+		setSession(newSession);
+	};
+
 	return (
 		<BrowserRouter>
 			<Routes>
@@ -38,7 +42,7 @@ function App() {
 					{session.isLoggedIn ? (
 						<Route
 							path="user-profile"
-							element={<UserProfile session={session} />}
+							element={<UserProfile onLogOut={handleLogOut} session={session} />}
 						/>
 					) : (
 						<Route
