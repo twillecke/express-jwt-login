@@ -98,7 +98,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 							Sign Up
 						</a>
 						<button
-							className="pt-2 text-blue-400 hover:text-blue-500 focus:border-transparent hover:border-transparent"
+							className="pt-2 bg-slate-700 hover:bg-slate-800 ml-4 rounded-md	 focus:border-transparent hover:border-transparent"
 							type="submit"
 						>
 							Login
