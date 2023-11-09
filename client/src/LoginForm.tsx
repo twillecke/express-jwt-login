@@ -12,7 +12,6 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 		username: "",
 		password: "",
 	});
-
 	const [invalidAuth, setInvalidAuth] = useState(false);
 	const navigate = useNavigate();
 
@@ -27,7 +26,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 			const response = await axios.post(
 				"http://localhost:3000/login",
 				loginInputData,
-			);		
+			);
 
 			if (response.status === 200) {
 				// Fetch user data or relevant information here and create a session object
@@ -37,6 +36,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 					user: userData.name,
 					email: userData.email,
 					user_id: userData.user_id,
+					signup_date: userData.signup_date
 				};
 				onLogin(session); // Pass the session object to the callback
 				navigate("/user-profile");
@@ -82,7 +82,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 						onChange={(e) => handleInputChange(e, "username")}
 					></input>
 					<input
-						className={`mb-3 p-3 rounded-md border-2 ${
+						className={`mb-1 p-3 rounded-md border-2 ${
 							invalidAuth ? "border-2 border-red-700" : ""
 						}`}
 						type="password"
@@ -90,7 +90,12 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
 						value={formData.password}
 						onChange={(e) => handleInputChange(e, "password")}
 					></input>
-					<div className="flex justify-end">
+					{invalidAuth ? (
+						<span className="text-sm text-red-500">
+							*Invalid username and/or password
+						</span>
+					) : null}
+					<div className="mt-4 flex justify-end">
 						<a
 							href="/sign-up"
 							className="pt-2 text-zinc-300 hover:text-zinc-400"

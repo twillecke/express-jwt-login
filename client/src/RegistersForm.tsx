@@ -86,6 +86,11 @@ export default function RegisterForm() {
 						value={formData.emailAddress}
 						onChange={(e) => handleInputChange(e, "emailAddress")}
 					></input>
+					{invalidAuth ? (
+						<span className="mb-4 ml-4 text-sm text-red-500">
+							*Invalid input fields
+						</span>
+					) : null}
 					<h2 className="mb-4">Login Data</h2>
 					<input
 						name="username-input"
