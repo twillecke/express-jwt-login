@@ -1,4 +1,6 @@
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
 const verifyToken = (req: any, res: any, next: any) => {
 	const authHeader = req.headers["authorization"];
@@ -10,7 +12,7 @@ const verifyToken = (req: any, res: any, next: any) => {
 			.json({ error: "Unauthorized: No token provided" });
 	}
 
-	const secret = "123";
+	const secret = process.env.SECRET as string;
 
 	jwt.verify(token, secret, (err: any, decoded: any) => {
 		if (err) {
