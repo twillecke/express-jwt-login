@@ -6,6 +6,7 @@ import UserRegistrationService from "./services/UserRegistrationService";
 const bcrypt = require("bcrypt");
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+import verifyToken from "./middlewares/authMiddleware"
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -39,7 +40,7 @@ app.get("/users", async (req, res) => {
 	}
 });
 
-app.get("/users/:user_id", async (req, res) => {
+app.get("/users/:user_id", verifyToken, async (req, res) => {
 	const { user_id } = req.params;
 	try {
 		const data = await db.query(
