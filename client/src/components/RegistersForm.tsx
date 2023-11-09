@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ChangeEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AuthService from "../services/AuthService";
 
 export default function RegisterForm() {
 	const [formData, setFormData] = useState({
@@ -26,12 +27,11 @@ export default function RegisterForm() {
 		};
 
 		try {
-			const response = await axios.post(
-				"http://localhost:3000/users",
-				registrationData,
-			);
+			const response = await AuthService.register(registrationData);
 
 			if (response.status === 201) {
+				console.log(response);
+				
 				navigate("/login");
 			} else {
 				setInvalidAuth(true);

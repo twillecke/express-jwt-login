@@ -8,27 +8,9 @@ import {
 import LoginForm from "./LoginForm";
 import RegisterForm from "./RegistersForm";
 import UserProfile from "./UserProfile";
-import { useState } from "react";
-import { Session } from "./types/Session";
-
-const initialSession: Session = {
-	isLoggedIn: false,
-	user: "",
-	email: "",
-	user_id: "",
-	signup_date:""
-};
 
 function App() {
-	const [session, setSession] = useState(initialSession);
-
-	const handleLogin = (newSession: Session) => {
-		setSession(newSession);
-	};
-
-	const handleLogOut = (newSession: Session) => {
-		setSession(newSession);
-	};
+	const isLoggedIn = true;
 
 	return (
 		<BrowserRouter>
@@ -37,13 +19,13 @@ function App() {
 					<Route
 						path="login"
 						index
-						element={<LoginForm onLogin={handleLogin} />}
+						element={<LoginForm/>}
 					/>
 					<Route path="sign-up" element={<RegisterForm />} />
-					{session.isLoggedIn ? (
+					{isLoggedIn ? (
 						<Route
 							path="user-profile"
-							element={<UserProfile onLogOut={handleLogOut} session={session} />}
+							element={<UserProfile/>}
 						/>
 					) : (
 						<Route

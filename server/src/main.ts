@@ -85,7 +85,7 @@ app.post("/login", async (req, res) => {
 			);
 			if (isPasswordValid) {
 				const secret = process.env.SECRET as string;
-				const token = jwt.sign(
+				const accessToken = jwt.sign(
 					{ user_id: user.user_id, username: user.username },
 					secret,
 					{ expiresIn: 300 },
@@ -95,7 +95,7 @@ app.post("/login", async (req, res) => {
 					message: "Login successful",
 					auth: true,
 					user_id: user.user_id,
-					token: token,
+					accessToken: accessToken,
 				});
 			} else {
 				res.status(401).json({ error: "Invalid username or password" });
