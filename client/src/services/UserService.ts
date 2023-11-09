@@ -8,8 +8,8 @@ class UserService {
 		return axios.get(API_URL + "all");
 	}
 
-	getUserBoard() {
-		return axios.get(API_URL + "user", { headers: authHeader() });
+	getUserProfile(idUser: string) {
+		return axios.get(API_URL + `users/${idUser}`, { headers: authHeader() });
 	}
 
 	getModeratorBoard() {
