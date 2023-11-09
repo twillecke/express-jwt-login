@@ -1,4 +1,3 @@
-import axios from "axios";
 import { ChangeEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthService from "../services/AuthService";
@@ -31,7 +30,7 @@ export default function RegisterForm() {
 
 			if (response.status === 201) {
 				console.log(response);
-				
+
 				navigate("/login");
 			} else {
 				setInvalidAuth(true);
