@@ -86,10 +86,11 @@ app.post("/login", async (req, res) => {
 			);
 			if (isPasswordValid) {
 				const secret = process.env.SECRET as string;
+				const expirationTime = 5;
 				const accessToken = jwt.sign(
 					{ user_id: user.user_id, username: user.username },
 					secret,
-					{ expiresIn: 300 },
+					{ expiresIn: expirationTime },
 				);
 
 				res.status(200).json({

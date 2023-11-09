@@ -23,11 +23,20 @@ function UserProfile() {
 					const response = await UserService.getUserProfile(
 						currentUser.user_id,
 					);
-					const data = response.data[0];
-					setCurrentUser((prevUser) => ({ ...prevUser, ...data }));
+					if (response && response.data && response.data.length > 0) {
+						const data = response.data[0];
+						setCurrentUser((prevUser) => ({
+							...prevUser,
+							...data,
+						}));
+					} else {
+						console.error("No user profile data found");
+						navigate("/login");
+					}
 				}
 			} catch (error) {
 				console.error("Error fetching user profile data:", error);
+				navigate("/login");
 			}
 		};
 
@@ -42,12 +51,12 @@ function UserProfile() {
 	return (
 		<div className="flex justify-center items-center h-screen">
 			<div className="bg-neutral-600 p-10 rounded-md">
-				<h1 className="mb-4">Welcome {currentUser?.name}</h1>
+				<h1 className="mb-4">Welcome {currentUser.name}</h1>
 				<div className="justify-end">
 					<p>You've successfully logged in!</p>
 					<br />
-					<p>Your email is: {currentUser?.email}</p>
-					<p>You're with us since: {currentUser?.signup_date}</p>
+					<p>Your email is: {currentUser.email}</p>
+					<p>You're with us since: {currentUser.signup_date}</p>
 				</div>
 				<button
 					className="mt-6 rounded-md bg-slate-700 hover:bg-slate-800"
