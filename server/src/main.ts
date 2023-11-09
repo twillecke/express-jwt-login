@@ -1,17 +1,18 @@
 import express from "express";
 import pgp from "pg-promise";
 import cors from "cors";
+import UserCredentials from "./domain/entity/UserCredentials";
+import UserRegistrationService from "./services/UserRegistrationService";
 const bcrypt = require("bcrypt");
+import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 
-const app = express();
+dotenv.config();
 const PORT = process.env.PORT || 3000;
 const PGP_CONNECTION =
 	process.env.PGP_CONNECTION || "postgres://postgres:123@localhost:5444/app";
 
-app.use(express.json());
-
-const db = pgp()(PGP_CONNECTION);
-
+const app = express();
 app.use(
 	cors({
 		origin: "*",
@@ -20,6 +21,10 @@ app.use(
 			"Origin,X-Requested-With,Content-Type,Accept,Authorization",
 	}),
 );
+app.use(express.json());
+
+const db = pgp()(PGP_CONNECTION);
+const userRegistrationService = new UserRegistrationService(db);
 
 app.get("/users", async (req, res) => {
 	try {
@@ -50,56 +55,15 @@ app.get("/users/:user_id", async (req, res) => {
 
 app.post("/users", async (req, res) => {
 	const { name, lastname, email, username, password } = req.body;
-
-	if (
-		name === "" ||
-		lastname === "" ||
-		email === "" ||
-		username === "" ||
-		password === ""
-	) {
-		return res.status(400).json({
-			error: "Invalid data. Please provide all required fields.",
-		});
-	}
-
 	try {
-		// Step 1: Check if the username already exists in "user_login_data"
-		const existingUser = await db.oneOrNone(
-			"SELECT username FROM thiago.user_login_data WHERE username = $1;",
-			[username],
+		const user = new UserCredentials(
+			name,
+			lastname,
+			email,
+			username,
+			password,
 		);
-
-		if (existingUser) {
-			res.status(409).json({ error: "Username already exists" });
-		} else {
-			// Step 2: Insert user account information into the "user_account" table
-			const userAccountQuery = `
-			INSERT INTO thiago.user_account (name, lastname, email, signup_date)
-			VALUES ($1, $2, $3, NOW())
-			RETURNING user_id;
-            `;
-
-			const userAccountResult = await db.one(userAccountQuery, [
-				name,
-				lastname,
-				email,
-			]);
-
-			// Retrieve the generated user_id
-			const user_id = userAccountResult.user_id;
-
-			// Step 3: Insert user login data into the "user_login_data" table with the obtained user_id
-			const saltRounds = 10;
-			const hashPassword = await bcrypt.hash(password, saltRounds);
-
-			await db.query(
-				"INSERT INTO thiago.user_login_data (user_id, username, hashpassword) VALUES ($1, $2, $3);",
-				[user_id, username, hashPassword],
-			);
-
-			res.status(201).json({ message: "User added successfully" });
-		}
+		userRegistrationService.execute(user, res);
 	} catch (error) {
 		console.error("Error:", error);
 		res.status(500).json({ error: "Internal Server Error" });
@@ -120,9 +84,18 @@ app.post("/login", async (req, res) => {
 				user.hashpassword,
 			);
 			if (isPasswordValid) {
+				const secret = process.env.SECRET as string;
+				const token = jwt.sign(
+					{ user_id: user.user_id, username: user.username },
+					secret,
+					{ expiresIn: 300 },
+				);
+
 				res.status(200).json({
 					message: "Login successful",
+					auth: true,
 					user_id: user.user_id,
+					token: token,
 				});
 			} else {
 				res.status(401).json({ error: "Invalid username or password" });
@@ -134,6 +107,10 @@ app.post("/login", async (req, res) => {
 		console.error("Error:", error);
 		res.status(500).json({ error: "Internal Server Error" });
 	}
+});
+
+app.post("/logout", function (req, res) {
+	res.json({ auth: false, token: null });
 });
 
 app.listen(PORT, () => {
