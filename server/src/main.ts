@@ -3,10 +3,8 @@ import pgp from "pg-promise";
 import cors from "cors";
 import UserCredentials from "./domain/entity/UserCredentials";
 import UserRegistrationService from "./services/UserRegistrationService";
-const bcrypt = require("bcrypt");
 import dotenv from "dotenv";
-import jwt from "jsonwebtoken";
-import verifyToken from "./middlewares/authMiddleware";
+import verifyToken from "./middlewares/authorizationMiddleware";
 import UserAuthenticationService from "./services/UserAuthenticationService";
 import UserDataService from "./services/UserDataService";
 
@@ -31,22 +29,22 @@ const userAuthService = new UserAuthenticationService(db);
 const userDataService = new UserDataService(db);
 
 app.get("/api/v1/users", async (req, res) => {
-    try {
-        const data = await userDataService.getAllUsers();
-        res.json(data);
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
-    }
+	try {
+		const data = await userDataService.getAllUsers();
+		res.json(data);
+	} catch (error: any) {
+		res.status(500).json({ error: error.message });
+	}
 });
 
 app.get("/api/v1/users/:user_id", verifyToken, async (req, res) => {
-    const { user_id } = req.params;
-    try {
-        const data = await userDataService.getUserById(user_id);
-        res.json(data);
-    } catch (error: any) {
-        res.status(500).json({ error: error.message });
-    }
+	const { user_id } = req.params;
+	try {
+		const data = await userDataService.getUserById(user_id);
+		res.json(data);
+	} catch (error: any) {
+		res.status(500).json({ error: error.message });
+	}
 });
 
 app.post("/api/v1/users", async (req, res) => {
