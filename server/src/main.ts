@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import verifyToken from "./middlewares/authorizationMiddleware";
 import UserAuthenticationService from "./services/UserAuthenticationService";
 import UserDataService from "./services/UserDataService";
+import UserDeletionService from "./services/UserDeletionService";
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -27,20 +28,11 @@ const db = pgp()(PGP_CONNECTION);
 const userRegistrationService = new UserRegistrationService(db);
 const userAuthService = new UserAuthenticationService(db);
 const userDataService = new UserDataService(db);
+const userDeletionService = new UserDeletionService(db);
 
 app.get("/api/v1/users", async (req, res) => {
 	try {
 		const data = await userDataService.getAllUsers();
-		res.json(data);
-	} catch (error: any) {
-		res.status(500).json({ error: error.message });
-	}
-});
-
-app.get("/api/v1/users/:user_id", verifyToken, async (req, res) => {
-	const { user_id } = req.params;
-	try {
-		const data = await userDataService.getUserById(user_id);
 		res.json(data);
 	} catch (error: any) {
 		res.status(500).json({ error: error.message });
@@ -62,6 +54,31 @@ app.post("/api/v1/users", async (req, res) => {
 		console.error("Error:", error);
 		res.status(500).json({ error: "Internal Server Error" });
 	}
+});
+
+app.get("/api/v1/users/:user_id", verifyToken, async (req, res) => {
+	const { user_id } = req.params;
+	try {
+		const data = await userDataService.getUserById(user_id);
+		res.json(data);
+	} catch (error: any) {
+		res.status(500).json({ error: error.message });
+	}
+});
+
+app.delete("/api/v1/users/:user_id", async (req, res) => {
+    const { user_id } = req.params;
+    try {
+        const deletedUser = await userDeletionService.deleteUserById(user_id);
+
+        if (deletedUser) {
+            res.json({ message: "User deleted successfully", user: deletedUser });
+        } else {
+            res.status(404).json({ error: "User not found" });
+        }
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 app.post("/api/v1/login", async (req, res) => {
