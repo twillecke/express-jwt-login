@@ -1,24 +1,23 @@
--- Drop user_login_data table if it exists
-DROP TABLE IF EXISTS thiago.user_login_data;
+-- File: create.sql
 
--- Drop user_account table if it exists
-DROP TABLE IF EXISTS thiago.user_account;
-
--- Create user_account table
+-- Create the user_account table
 CREATE TABLE IF NOT EXISTS thiago.user_account
 (
-    user_id serial PRIMARY KEY,
-    name text,
-    lastname text,
-    email text,
-    signup_date timestamp with time zone
+    user_id SERIAL PRIMARY KEY,
+    name TEXT,
+    lastname TEXT,
+    email TEXT,
+    signup_date TIMESTAMPTZ
 );
 
--- Create user_login_data table
+-- Create the user_login_data table
 CREATE TABLE IF NOT EXISTS thiago.user_login_data
 (
-    user_id serial PRIMARY KEY,
-    username text UNIQUE,
-    hashpassword text,
-    FOREIGN KEY (user_id) REFERENCES thiago.user_account (user_id) ON DELETE NO ACTION ON UPDATE NO ACTION
+    user_id SERIAL PRIMARY KEY,
+    username TEXT UNIQUE,
+    hashpassword TEXT,
+    FOREIGN KEY (user_id) REFERENCES thiago.user_account (user_id) ON DELETE CASCADE
 );
+
+-- Optionally, add an index on the username for faster lookups
+CREATE INDEX IF NOT EXISTS idx_username ON thiago.user_login_data (username);
