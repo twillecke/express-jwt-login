@@ -5,12 +5,11 @@ class UserRegistrationService {
 	db;
 
 	constructor(database: any) {
-		this.db = database; // Database connection
+		this.db = database;
 	}
 
 	async execute(user: UserCredentials, res: any) {
 		try {
-			// Step 1: Check if the username already exists in "user_login_data"
 			const existingUser = await this.db.oneOrNone(
 				"SELECT username FROM thiago.user_login_data WHERE username = $1;",
 				[user.username],
@@ -22,7 +21,6 @@ class UserRegistrationService {
 					.json({ error: "Username already exists" });
 			}
 
-			// Step 2: Insert user account information into the "user_account" table
 			const userAccountQuery = `
         INSERT INTO thiago.user_account (name, lastname, email, signup_date)
         VALUES ($1, $2, $3, NOW())
@@ -35,10 +33,8 @@ class UserRegistrationService {
 				user.email,
 			]);
 
-			// Retrieve the generated user_id
 			const user_id = userAccountResult.user_id;
 
-			// Step 3: Insert user login data into the "user_login_data" table with the obtained user_id
 			const saltRounds = 10;
 			const hashPassword = await bcrypt.hash(user.password, saltRounds);
 

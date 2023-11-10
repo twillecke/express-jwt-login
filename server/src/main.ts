@@ -6,12 +6,11 @@ import UserRegistrationService from "./services/UserRegistrationService";
 const bcrypt = require("bcrypt");
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
-import verifyToken from "./middlewares/authMiddleware"
-
+import verifyToken from "./middlewares/authMiddleware";
+ 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
-const PGP_CONNECTION =
-	process.env.PGP_CONNECTION || "postgres://postgres:123@localhost:5444/app";
+const PGP_CONNECTION = "postgres://postgres:123@localhost:5444/app";
 
 const app = express();
 app.use(
