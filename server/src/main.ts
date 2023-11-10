@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import verifyToken from "./middlewares/authMiddleware";
 import UserAuthenticationService from "./services/UserAuthenticationService";
+import UserDataService from "./services/UserDataService";
 
 dotenv.config();
 const PORT = process.env.PORT || 3000;
@@ -27,32 +28,25 @@ app.use(express.json());
 const db = pgp()(PGP_CONNECTION);
 const userRegistrationService = new UserRegistrationService(db);
 const userAuthService = new UserAuthenticationService(db);
+const userDataService = new UserDataService(db);
 
 app.get("/api/v1/users", async (req, res) => {
-	try {
-		const data = await db.query(
-			"SELECT user_id, name, lastname, email, signup_date FROM thiago.user_account;",
-			[],
-		);
-		res.json(data);
-	} catch (error) {
-		console.error("Error:", error);
-		res.status(500).json({ error: "Internal Server Error" });
-	}
+    try {
+        const data = await userDataService.getAllUsers();
+        res.json(data);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 app.get("/api/v1/users/:user_id", verifyToken, async (req, res) => {
-	const { user_id } = req.params;
-	try {
-		const data = await db.query(
-			"SELECT * FROM thiago.user_account where user_id = $1;",
-			[user_id],
-		);
-		res.json(data);
-	} catch (error) {
-		console.error("Error:", error);
-		res.status(500).json({ error: "Internal Server Error" });
-	}
+    const { user_id } = req.params;
+    try {
+        const data = await userDataService.getUserById(user_id);
+        res.json(data);
+    } catch (error: any) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 app.post("/api/v1/users", async (req, res) => {

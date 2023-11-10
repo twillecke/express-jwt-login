@@ -2,9 +2,9 @@ const bcrypt = require("bcrypt");
 import jwt from "jsonwebtoken";
 
 class UserAuthenticationService {
-	db;
+	private db;
 
-	constructor(database: any) {
+	constructor(readonly database: any) {
 		this.db = database;
 	}
 

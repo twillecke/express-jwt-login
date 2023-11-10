@@ -2,9 +2,9 @@ const bcrypt = require("bcrypt");
 import UserCredentials from "../domain/entity/UserCredentials";
 
 class UserRegistrationService {
-	db;
+	private db;
 
-	constructor(database: any) {
+	constructor(readonly database: any) {
 		this.db = database;
 	}
 
