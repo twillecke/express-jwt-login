@@ -7,7 +7,8 @@ const bcrypt = require("bcrypt");
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import verifyToken from "./middlewares/authMiddleware";
- 
+import UserAuthenticationService from "./services/UserAuthenticationService";
+
 dotenv.config();
 const PORT = process.env.PORT || 3000;
 const PGP_CONNECTION = "postgres://postgres:123@localhost:5444/app";
@@ -25,6 +26,7 @@ app.use(express.json());
 
 const db = pgp()(PGP_CONNECTION);
 const userRegistrationService = new UserRegistrationService(db);
+const userAuthService = new UserAuthenticationService(db);
 
 app.get("/api/v1/users", async (req, res) => {
 	try {
@@ -74,35 +76,12 @@ app.post("/api/v1/login", async (req, res) => {
 	const { username, password } = req.body;
 
 	try {
-		const user = await db.oneOrNone(
-			"SELECT user_id, username, hashpassword FROM thiago.user_login_data WHERE username = $1;",
-			[username],
-		);
-		if (user) {
-			const isPasswordValid = await bcrypt.compare(
-				password,
-				user.hashpassword,
-			);
-			if (isPasswordValid) {
-				const secret = process.env.SECRET as string;
-				const expirationTime = 5;
-				const accessToken = jwt.sign(
-					{ user_id: user.user_id, username: user.username },
-					secret,
-					{ expiresIn: expirationTime },
-				);
+		const authResult = await userAuthService.execute(username, password);
 
-				res.status(200).json({
-					message: "Login successful",
-					auth: true,
-					user_id: user.user_id,
-					accessToken: accessToken,
-				});
-			} else {
-				res.status(401).json({ error: "Invalid username or password" });
-			}
+		if (authResult.success) {
+			res.status(200).json(authResult);
 		} else {
-			res.status(401).json({ error: "Invalid username or password" });
+			res.status(401).json({ error: authResult.error });
 		}
 	} catch (error) {
 		console.error("Error:", error);
