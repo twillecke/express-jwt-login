@@ -26,7 +26,7 @@ app.use(express.json());
 const db = pgp()(PGP_CONNECTION);
 const userRegistrationService = new UserRegistrationService(db);
 
-app.get("/users", async (req, res) => {
+app.get("/api/v1/users", async (req, res) => {
 	try {
 		const data = await db.query(
 			"SELECT user_id, name, lastname, email, signup_date FROM thiago.user_account;",
@@ -39,7 +39,7 @@ app.get("/users", async (req, res) => {
 	}
 });
 
-app.get("/users/:user_id", verifyToken, async (req, res) => {
+app.get("/api/v1/users/:user_id", verifyToken, async (req, res) => {
 	const { user_id } = req.params;
 	try {
 		const data = await db.query(
@@ -53,7 +53,7 @@ app.get("/users/:user_id", verifyToken, async (req, res) => {
 	}
 });
 
-app.post("/users", async (req, res) => {
+app.post("/api/v1/users", async (req, res) => {
 	const { name, lastname, email, username, password } = req.body;
 	try {
 		const user = new UserCredentials(
@@ -70,7 +70,7 @@ app.post("/users", async (req, res) => {
 	}
 });
 
-app.post("/login", async (req, res) => {
+app.post("/api/v1/login", async (req, res) => {
 	const { username, password } = req.body;
 
 	try {
@@ -110,7 +110,7 @@ app.post("/login", async (req, res) => {
 	}
 });
 
-app.post("/logout", function (req, res) {
+app.post("/api/v1/logout", function (req, res) {
 	res.json({ auth: false, token: null });
 });
 
