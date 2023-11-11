@@ -48,6 +48,18 @@ function UserProfile() {
 		navigate("/login");
 	}
 
+	function handleDeleteAccount() {
+		const userData = JSON.parse(localStorage.getItem("user"));
+
+		if (userData) {
+			UserService.deleteUserProfile(userData.user_id);
+			localStorage.removeItem("user");
+			navigate("/login");
+		} else {
+			console.error("User data not found in localStorage");
+		}
+	}
+
 	return (
 		<div className="flex justify-center items-center h-screen">
 			<div className="bg-neutral-600 p-10 rounded-md">
@@ -58,12 +70,20 @@ function UserProfile() {
 					<p>Your email is: {currentUser.email}</p>
 					<p>You're with us since: {currentUser.signup_date}</p>
 				</div>
-				<button
-					className="mt-6 rounded-md bg-slate-700 hover:bg-slate-800"
-					onClick={handleLogOut}
-				>
-					Logout
-				</button>
+				<div className="flex justify-between">
+					<button
+						className="mt-6 rounded-md bg-slate-700 hover:bg-slate-800"
+						onClick={handleLogOut}
+					>
+						Logout
+					</button>
+					<button
+						className="mt-6 rounded-md bg-red-800 hover:bg-red-900"
+						onClick={handleDeleteAccount}
+					>
+						Delete Account
+					</button>
+				</div>
 			</div>
 		</div>
 	);

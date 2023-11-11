@@ -12,6 +12,10 @@ class UserService {
 		return axios.get(API_URL + `users/${idUser}`, { headers: authHeader() });
 	}
 
+	deleteUserProfile(idUser: string) {
+		return axios.delete(API_URL + `users/${idUser}`, { headers: authHeader() });
+	}
+
 	getModeratorBoard() {
 		return axios.get(API_URL + "mod", { headers: authHeader() });
 	}
